@@ -215,12 +215,16 @@ let Field = class {
 			if(k == VK_SPACE) {this.retry()}
 			return false
 		}
+		if(snake.changeDirBlock) {
+			return false
+		}
 		let d = snake.getDirection() // Curr Direction
 
 		if ((k == VK_RIGHT || k == VK_D) && d != DIR_LEFT) {snake.changeDirection(DIR_RIGHT)} 
 		if ((k == VK_DOWN || k == VK_S) && d != DIR_TOP) {snake.changeDirection(DIR_BOTTOM)} 
 		if ((k == VK_LEFT || k == VK_A) && d != DIR_RIGHT) {snake.changeDirection(DIR_LEFT)}; 
 		if ((k == VK_UP || k == VK_W) && d != DIR_BOTTOM) {snake.changeDirection(DIR_TOP)}; 
+		snake.changeDirBlock = true;
 	}
 }
 
@@ -261,6 +265,9 @@ let Snake = class {
 
     	this.moveInterval = setInterval(function () { self.move() }, MOVE_TIMEOUT);
     	
+    	// prohibits changing the direction of the second time until the timer triggers
+    	this.changeDirBlock = false
+
     	this.draw() // Draw a snake
   	}
 
@@ -309,7 +316,7 @@ let Snake = class {
 
   	
   	move() { // Iteration of snake motion
-
+  		this.changeDirBlock = false // Allow change direction
   		// Get tail:
   		let tail = this.body[this.body.length-1]
   		
