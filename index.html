@@ -1,6 +1,4 @@
-<div id="field">
-
-</div>
+<div id="field"></div>
 
 
 <style>
@@ -95,7 +93,7 @@ let Field = class {
 
 				let newCell = document.createElement('div');
 				newCell.className = 'cell ' + j + '_' + i 
-				if ( IS_EDGES_OBST && ((i % 19 == 0) || (j % 19 == 0))) {
+				if ( IS_EDGES_OBST && ((i % (VERT_COUNT-1) == 0) || (j % (HOR_COUNT-1) == 0))) {
 					newCell.className += ' o' // Along the edges of the obstacle
 				}
 				newCell.setAttribute('x',j)
@@ -120,16 +118,29 @@ let Field = class {
 		// GAME OBJECTS: 
 		this.apple = new Apple(this) // CREATE NEW APPLE-OBJECT
 		this.snake = new Snake(this) // CREATE NEW SNAKE-OBJECT
+
+		this.isGameOver = false
 	}
 
 	retry() {
-		cells = this.field.getElementsByClassName('cell')
-		for (let i; i < cells.length; i++) {
+		let cells = this.field.getElementsByClassName('cell')
+		for (let i = 0; i < cells.length; i++) {
 			let x = cells[i].getAttribute('x')
 			let y = cells[i].getAttribute('y')
-
-			 
+			cells[i].className =  'cell ' + x + '_' + y 
+			if( IS_EDGES_OBST && ((x % (HOR_COUNT-1) ==0) || (y % (VERT_COUNT-1)  == 0))){
+				cells[i].className += ' o'
+			} 
 		}
+		this.scores = 0
+		this.scoresEl.innerText = STR_SCORES + '0'
+
+		this.field.className = ''
+
+		// New game-objects
+		this.apple = new Apple(this) 
+		this.snake = new Snake(this) 
+		this.isGameOver = false
 	}
 
 	incScores() {
@@ -145,6 +156,8 @@ let Field = class {
 		this.field.className = 'end'
 		this.snake = null
 		this.apple = null
+
+		this.isGameOver = true
 	}
 	choiceAction(cell) { // The choice of action depending on the cell that you stumbled upon
   		switch(cell) {
@@ -205,6 +218,7 @@ let Field = class {
 		return 'n' // Nothing is in the cell
 	}
 	onKeyDown(e) {
+		if(this.isGameOver) {return false}
 		let k = e.keyCode;
 		let snake = this.snake
 		let d = snake.getDirection() // Curr Direction
