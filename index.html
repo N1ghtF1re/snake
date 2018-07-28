@@ -1,5 +1,8 @@
 <div id="field"></div>
-
+<div id="help">
+	<h3>Control: </h3>
+	<p>W/A/S/D or UP/LEFT/DOWN/RIGHT - move</p>
+	<p>SPACE - restart</p>
 
 <style>
 	#field .cell {
@@ -29,9 +32,23 @@
 	    width: 440px;
 	    height: 440px;
 	    text-align: center;
-	    margin-top: 189px;
+	    top: 165px;
 	    color: #fff;
 	    -webkit-text-stroke: 1px sienna;
+	     font-family: fantasy;
+	}
+	.end:after {
+		content: 'Press space to restart';
+	    position: absolute;
+	    font-size: 40px;
+	    display: table-cell;
+	    width: 440px;
+	    height: 440px;
+	    text-align: center;
+	    top: 235px;
+	    color: #fff;
+	    -webkit-text-stroke: 1px sienna;
+	    font-family: fantasy;
 	}
 	#field .scores {
 	    width: 432px;
@@ -40,6 +57,17 @@
 	    border: 4px solid #c1c1c1;
 	    text-align: center;
 	    font-size: 24px;
+	}
+	#help {
+	    width: 430px;
+	    background: #ffe69b;
+	    padding: 4px;
+	    margin-top: 5px;
+	    border: 1px solid #FFC107;
+	}
+	#help p, #help h3{
+		padding: 0;
+		margin: 0;
 	}
 
 </style>
@@ -62,6 +90,13 @@ var VK_UP = 38
 var VK_DOWN = 40
 var VK_LEFT = 37
 var VK_RIGHT = 39
+var VK_W = 87
+var VK_S = 83
+var VK_A = 65
+var VK_D = 68
+var VK_SPACE = 32
+
+
 
 // MOVING TIMEOUT (ms):
 var MOVE_TIMEOUT = 60
@@ -119,7 +154,6 @@ let Field = class {
 		this.apple = new Apple(this) // CREATE NEW APPLE-OBJECT
 		this.snake = new Snake(this) // CREATE NEW SNAKE-OBJECT
 
-		this.isGameOver = false
 	}
 
 	retry() {
@@ -140,7 +174,7 @@ let Field = class {
 		// New game-objects
 		this.apple = new Apple(this) 
 		this.snake = new Snake(this) 
-		this.isGameOver = false
+	
 	}
 
 	incScores() {
@@ -157,8 +191,8 @@ let Field = class {
 		this.snake = null
 		this.apple = null
 
-		this.isGameOver = true
 	}
+
 	choiceAction(cell) { // The choice of action depending on the cell that you stumbled upon
   		switch(cell) {
   			case 'a': 
@@ -217,16 +251,21 @@ let Field = class {
 		}
 		return 'n' // Nothing is in the cell
 	}
+
 	onKeyDown(e) {
-		if(this.isGameOver) {return false}
 		let k = e.keyCode;
 		let snake = this.snake
+		
+		if(snake == null) { // if snake == null => GAME OVER
+			if(k == VK_SPACE) {this.retry()}
+			return false
+		}
 		let d = snake.getDirection() // Curr Direction
 
-		if (k == VK_RIGHT && d != DIR_LEFT) {snake.changeDirection(DIR_RIGHT)} 
-		if (k == VK_DOWN && d != DIR_TOP) {snake.changeDirection(DIR_BOTTOM)} 
-		if (k == VK_LEFT && d != DIR_RIGHT) {snake.changeDirection(DIR_LEFT)}; 
-		if (k == VK_UP && d != DIR_BOTTOM) {snake.changeDirection(DIR_TOP)}; 
+		if ((k == VK_RIGHT || k == VK_D) && d != DIR_LEFT) {snake.changeDirection(DIR_RIGHT)} 
+		if ((k == VK_DOWN || k == VK_S) && d != DIR_TOP) {snake.changeDirection(DIR_BOTTOM)} 
+		if ((k == VK_LEFT || k == VK_A) && d != DIR_RIGHT) {snake.changeDirection(DIR_LEFT)}; 
+		if ((k == VK_UP || k == VK_W) && d != DIR_BOTTOM) {snake.changeDirection(DIR_TOP)}; 
 	}
 }
 
@@ -238,8 +277,8 @@ let Apple = class {
 		this.generate()
 	}
 	generate() {
-		this.x = getRandomInt(1, HOR_COUNT - 1)
-		this.y = getRandomInt(1, VERT_COUNT - 1)
+		this.x = getRandomInt(0, HOR_COUNT)
+		this.y = getRandomInt(0, VERT_COUNT)
 		if (!this.pfield.isCellEmpty(this.x, this.y)) { 
 			this.generate() // There is something in the cell => regenerate coords
 		} else {
