@@ -18,8 +18,8 @@
 	// INITIALIZATION OF THE SNAKE GAME 
 
 	// field - id of field-div
-	gameField = new Field(field, VERT_COUNT, HOR_COUNT) // CREATE NEW SNAKE-OBJECT
-	onkeydown = function (e) {gameField.onKeyDown(e)}
+	gameField = new Field(field) // CREATE NEW SNAKE-OBJECT
+	onkeydown = function (e) {gameField.onKeyDown(e)} // Interception of keystroke events
 
 	</script>
 </body>

@@ -1,9 +1,29 @@
+
+/** JS-SNAKE GAME SCRIPT
+	author: Alexandr Pankratiew
+
+	INITIANALISATION EXAMPLE:
+
+	<script>
+		// field - id of field-div
+		gameField = new Field(field, VERT_COUNT, HOR_COUNT) // CREATE NEW SNAKE-OBJECT
+		onkeydown = function (e) {gameField.onKeyDown(e)}	
+	<script>
+**/
+
+
+
+
 // CONSTANTS: 
 
 // FIELD SIZES
 var HOR_COUNT = 20
 var VERT_COUNT = 20
 
+// SNAKE SIZES:
+var DEFAUL_SNAKE_SIZE = 3
+
+var NO_OBSTACLES_RADIUS = 3 // the number of cells down will not be an obstacle when generating a snake
 
 // DIRRECTIONS 
 var DIR_TOP = 1
@@ -23,9 +43,8 @@ var VK_D = 68
 var VK_SPACE = 32
 
 
-
 // MOVING TIMEOUT (ms):
-var MOVE_TIMEOUT = 60
+var MOVE_TIMEOUT = 100
 
 // STRING:
 var STR_SCORES = 'Scores: '
@@ -41,7 +60,6 @@ var ARR_OBSTACLES = [{'x':10,'y':10}, {'x':10, 'y':9}, {'x':10,'y':8}, {'x':9, '
 
 
 
-// CLASSES:
 
 /** Each cell of the field is a div block of cells class 
 	
@@ -52,14 +70,15 @@ var ARR_OBSTACLES = [{'x':10,'y':10}, {'x':10, 'y':9}, {'x':10,'y':8}, {'x':9, '
 	'o' - Obstacle cell
 **/
 
+// CLASSES:
 
 // The main game class - the field class
 let Field = class {
 
-	constructor(field, y_size, x_size) {
+	constructor(field) {
 		// GENERATE NEW FIELD
-		for(let i = 0; i < y_size; i++) {
-			for(let j=0; j < x_size; j++) {
+		for(let i = 0; i < VERT_COUNT; i++) {
+			for(let j=0; j < HOR_COUNT; j++) {
 
 				let newCell = document.createElement('div');
 				newCell.className = 'cell ' + j + '_' + i 
@@ -72,7 +91,7 @@ let Field = class {
 				field.appendChild(newCell);
 			}
 
-			let delimiter = document.createElement('br'); // After 20 cells - delemiter (new line)
+			let delimiter = document.createElement('br'); // After HOR_COUNT cells - delemiter (new line)
 			field.appendChild(delimiter);
 		}
 
@@ -81,7 +100,8 @@ let Field = class {
 		scores.innerText = STR_SCORES + '0' 
 		scores.className = 'scores'
 		field.appendChild(scores)
-		this.scoresEl = scores
+
+		this.scoresEl = scores // scores DOM element
 		this.scores = 0
 
 		this.field = field // field DOM element
@@ -97,13 +117,13 @@ let Field = class {
 	drawAdditionalObstacles() {
 		for(let i = 0; i < ARR_OBSTACLES.length; i++) {
 			let obstacle = ARR_OBSTACLES[i]
-			console.log(obstacle.x)
 			this.redrawCell(obstacle.x, obstacle.y, 'o')
 		}
 	}
+
 	retry() {
 		let cells = this.field.getElementsByClassName('cell')
-		for (let i = 0; i < cells.length; i++) {
+		for (let i = 0; i < cells.length; i++) { //Coloring the field by default
 			let x = cells[i].getAttribute('x')
 			let y = cells[i].getAttribute('y')
 			cells[i].className =  'cell ' + x + '_' + y 
@@ -112,7 +132,7 @@ let Field = class {
 			} 
 		}
 		this.drawAdditionalObstacles()
-		this.scores = 0
+		this.scores = 0 // Zeroing of the points counter
 		this.scoresEl.innerText = STR_SCORES + '0'
 
 		this.field.className = ''
@@ -141,17 +161,17 @@ let Field = class {
 
 	choiceAction(cell) { // The choice of action depending on the cell that you stumbled upon
   		switch(cell) {
-  			case 'a': 
+  			case 'a': // ate an apple
   				this.apple.generate()
   				this.incScores()
   				break
-  			case 'o':
+  			case 'o': // stumbled upon an obstacle
   				this.gameOver()
   				break
-  			case 's':
+  			case 's': // stumbled upon the tail
   				this.gameOver()
   				break
-  			case 'n':
+  			case 'n': // simple movement
   				break
   		}
   	}
@@ -169,18 +189,7 @@ let Field = class {
 
 	// Returns true if the cell does not have a snake / obstacle / apple / ...
 	isCellEmpty(x,y) {
-		let cell = this.getCell(x, y)
-
-		if(cell.classList.contains('s')) { // Cell have snake
-			return false
-		}
-		if(cell.classList.contains('o')) { // Cell have obstacle
-			return false
-		}
-		if(cell.classList.contains('a')) { // Cell have obstacle
-			return false
-		}
-		return true
+		return (this.getOwnClass(x,y) == 'n')
 	}
 
 	// Returns main cell class (snake/obstacle/apple/none)
@@ -241,29 +250,66 @@ let Apple = class {
 
 let Snake = class {
 	constructor(ParentField) {
-    	this.direction = DIR_BOTTOM; // Direction of movement of snake
-    	this.body = [{'x':1,'y':3}, {'x':1,'y':2}, {'x':1,'y':1}]
+    	this.direction = DIR_BOTTOM; // Direction of movement of snake by default
+    	this.body = []
     	this.pfield = ParentField // Parent field object
+    	this.generate()
+
+    	//this.body = [{'x':1,'y':3}, {'x':1,'y':2}, {'x':1,'y':1}] // Snake coords by default
+    	
     	var self = this;
+
     	this.moveInterval = setInterval(function () { self.move() }, MOVE_TIMEOUT);
     	
     	this.draw() // Draw a snake
   	}
-  	draw() {
+
+  	generate() {
+  		/* Generation of coordinates. 
+  		Requirements: 
+  		- The cells occupied by the snake must initially be empty
+  		- Under the very bottom cell of the snake NO_OBSTACLES_RADIUS cells must be empty
+  		*/
+  		let x = getRandomInt(1,HOR_COUNT-1)
+	    let y = getRandomInt(1,VERT_COUNT - NO_OBSTACLES_RADIUS - DEFAUL_SNAKE_SIZE - 1)
+	    this.body = []
+	    let i
+	    for(i = 0; i < DEFAUL_SNAKE_SIZE; i++) {
+	    	if(this.pfield.isCellEmpty(x,y+i)) {
+	    		this.body.push({'x':x, 'y':y+i}) // add new cell
+	    	} else {
+	    		this.generate() // Regenerate
+	    		return false;
+	    	}
+	    }
+	    let max = i + NO_OBSTACLES_RADIUS
+	    for (i; i < max; i++) {
+		    if(!this.pfield.isCellEmpty(x,y+i)) {
+		    	this.generate() // Regenerate
+		    	return false
+		    }
+		}
+	    this.body = this.body.reverse()
+  	}
+
+  	draw() { // Initial rendering
   		for(let i = 0; i < this.body.length; i++) {
   			let SnakeCell = this.body[i]
   			this.pfield.redrawCell(SnakeCell.x, SnakeCell.y,'s') // Make the cell a snake cell
   		}
   	}
+
   	changeDirection(direction) {
   		this.direction = direction 
   	}
+
   	getDirection() {
   		return this.direction
   	}
 
   	
-  	move() {
+  	move() { // Iteration of snake motion
+
   		// Get tail:
   		let tail = this.body[this.body.length-1]
   		
@@ -273,16 +319,16 @@ let Snake = class {
 
   		switch(this.direction) {
   			case DIR_TOP:
-  				head.y -= 1
+  				head.y--
   				break
   			case DIR_BOTTOM:
-  				head.y += 1
+  				head.y++
   				break
   			case DIR_LEFT:
-  				head.x -= 1
+  				head.x--
   				break
   			case DIR_RIGHT:
-  				head.x += 1
+  				head.x++
 
   		}
 
@@ -292,7 +338,8 @@ let Snake = class {
   		if (head.x == -1){head.x = HOR_COUNT-1}
   		if (head.y == -1){head.y = VERT_COUNT-1}
 
-  		this.body.unshift(head) // New head (first element)
+
+  		this.body.unshift(head) // New head (first element of body array)
 
   		let oldCellClass = this.pfield.getOwnClass(head.x, head.y) // Old cell coloring
   	
@@ -303,7 +350,8 @@ let Snake = class {
   			this.pfield.redrawCell(tail.x, tail.y) // Recolor the cell in the default color
   		} // if apple-cell => + 1 snake-cell => not delete tail
 
-  		this.pfield.choiceAction(oldCellClass)
+  		this.pfield.choiceAction(oldCellClass) // To determine the actions depending on the cell that was "absorbed"
+
   	}
 
 
