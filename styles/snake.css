@@ -1,0 +1,66 @@
+	#field {line-height: 0px;}
+	#field .cell {
+		width: 20px;
+		height: 20px;
+		background: gray;
+		border: 1px solid #a0a0a0;
+		display: inline-block;
+	}
+	#field .o {
+		background: red;
+	}
+	#field .a {
+		background: #94ff18;
+	}
+	#field .s {
+		background: #FFEB3B;
+	}
+	#field .gameover {
+		background: #F44336;
+	}
+	.end:before {
+	    content: 'Game over';
+	    position: absolute;
+	    font-size: 50px;
+	    display: table-cell;
+	    width: 440px;
+	    height: 440px;
+	    text-align: center;
+	    top: 165px;
+	    color: #fff;
+	    -webkit-text-stroke: 1px sienna;
+	     font-family: fantasy;
+	}
+	.end:after {
+		content: 'Press space to restart';
+	    position: absolute;
+	    font-size: 40px;
+	    display: table-cell;
+	    width: 440px;
+	    height: 440px;
+	    text-align: center;
+	    top: 235px;
+	    color: #fff;
+	    -webkit-text-stroke: 1px sienna;
+	    font-family: fantasy;
+	}
+	#field .scores {
+	    width: 432px;
+	    height: 30px;
+	    background: #e4e4e4;
+	    border: 4px solid #c1c1c1;
+	    text-align: center;
+	    font-size: 24px;
+		line-height: 24px;
+	}
+	#help {
+	    width: 430px;
+	    background: #ffe69b;
+	    padding: 4px;
+	    margin-top: 5px;
+	    border: 1px solid #FFC107;
+	}
+	#help p, #help h3{
+		padding: 0;
+		margin: 0;
+	}
