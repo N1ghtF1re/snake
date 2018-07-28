@@ -257,10 +257,9 @@ let Snake = class {
     	this.direction = DIR_BOTTOM; // Direction of movement of snake by default
     	this.body = []
     	this.pfield = ParentField // Parent field object
-    	this.generate()
-
-    	//this.body = [{'x':1,'y':3}, {'x':1,'y':2}, {'x':1,'y':1}] // Snake coords by default
     	
+    	this.generate() // generate default coords
+
     	var self = this;
 
     	this.moveInterval = setInterval(function () { self.move() }, MOVE_TIMEOUT);
