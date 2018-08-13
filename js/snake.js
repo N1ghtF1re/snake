@@ -88,11 +88,11 @@ let Field = class {
 				newCell.setAttribute('x',j)
 				newCell.setAttribute('y',i)
 
-				field.appendChild(newCell);
+				field.appendChild(newCell)
 			}
 
-			let delimiter = document.createElement('br'); // After HOR_COUNT cells - delemiter (new line)
-			field.appendChild(delimiter);
+			let delimiter = document.createElement('br') // After HOR_COUNT cells - delemiter (new line)
+			field.appendChild(delimiter)
 		}
 
 
@@ -208,7 +208,7 @@ let Field = class {
 	}
 
 	onKeyDown(e) {
-		let k = e.keyCode;
+		let k = e.keyCode
 		let snake = this.snake
 		
 		if(snake == null) { // if snake == null => GAME OVER
@@ -224,7 +224,7 @@ let Field = class {
 		if ((k == VK_DOWN || k == VK_S) && d != DIR_TOP) {snake.changeDirection(DIR_BOTTOM)} 
 		if ((k == VK_LEFT || k == VK_A) && d != DIR_RIGHT) {snake.changeDirection(DIR_LEFT)}; 
 		if ((k == VK_UP || k == VK_W) && d != DIR_BOTTOM) {snake.changeDirection(DIR_TOP)}; 
-		snake.changeDirBlock = true;
+		snake.changeDirBlock = true
 	}
 }
 
@@ -254,15 +254,15 @@ let Apple = class {
 
 let Snake = class {
 	constructor(ParentField) {
-    	this.direction = DIR_BOTTOM; // Direction of movement of snake by default
+    	this.direction = DIR_BOTTOM // Direction of movement of snake by default
     	this.body = []
     	this.pfield = ParentField // Parent field object
     	
     	this.generate() // generate default coords
 
-    	var self = this;
+    	var self = this
 
-    	this.moveInterval = setInterval(function () { self.move() }, MOVE_TIMEOUT);
+    	this.moveInterval = setInterval(function () { self.move() }, MOVE_TIMEOUT)
     	
     	// prohibits changing the direction of the second time until the timer triggers
     	this.changeDirBlock = false
@@ -285,7 +285,7 @@ let Snake = class {
 	    		this.body.push({'x':x, 'y':y+i}) // add new cell
 	    	} else {
 	    		this.generate() // Regenerate
-	    		return false;
+	    		return false
 	    	}
 	    }
 	    let max = i + NO_OBSTACLES_RADIUS
@@ -365,5 +365,5 @@ let Snake = class {
 
 // Additional function
 function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
+  return Math.floor(Math.random() * (max - min)) + min
 }
