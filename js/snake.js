@@ -208,7 +208,7 @@ let Field = class {
 	}
 
 	onKeyDown(e) {
-		let k = e.key;
+		let k = e.keyCode;
 		let snake = this.snake;
 		
 		if(snake == null) { // if snake == null => GAME OVER
@@ -234,6 +234,10 @@ let Field = class {
 };
 
 let Apple = class {
+	constructor(ParentField) {
+		this.pfield = ParentField;
+		this.generate();
+	}
 	generate() {
 		this.x = getRandomInt(0, HOR_COUNT);
 		this.y = getRandomInt(0, VERT_COUNT);
@@ -276,10 +280,10 @@ let Snake = class {
   		- Under the very bottom cell of the snake NO_OBSTACLES_RADIUS cells must be empty
   		*/
   		let x = getRandomInt(1,HOR_COUNT-1);
-	    let y = getRandomInt(1,VERT_COUNT - NO_OBSTACLES_RADIUS - DEFAUL_SNAKE_SIZE - 1);
+	    let y = getRandomInt(1,VERT_COUNT - NO_OBSTACLES_RADIUS - DEFAULT_SNAKE_SIZE - 1);
 	    this.body = [];
 	    let i;
-	    for(i = 0; i < DEFAUL_SNAKE_SIZE; i++) {
+	    for(i = 0; i < DEFAULT_SNAKE_SIZE; i++) {
 	    	if(this.pfield.isCellEmpty(x,y+i)) {
 	    		this.body.push({'x':x, 'y':y+i}) // add new cell
 	    	} else {
